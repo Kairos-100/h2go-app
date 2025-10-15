@@ -1,4 +1,4 @@
-const CACHE_NAME = 'h2go-v1';
+const CACHE_NAME = 'h2go-v2';
 const RUNTIME_CACHE = 'h2go-runtime';
 
 // Assets to cache on install

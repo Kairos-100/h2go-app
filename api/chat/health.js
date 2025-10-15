@@ -46,7 +46,7 @@ module.exports = async (req, res) => {
                 conversations: Array.isArray(conversations) ? conversations.length : 0,
                 feedback: Array.isArray(feedback) ? feedback.length : 0
             },
-            version: '1.0.0',
+            version: '1.0.1',
             uptime: process.uptime()
         };
 
@@ -58,7 +58,7 @@ module.exports = async (req, res) => {
             message: 'Health check failed',
             error: error.message,
             timestamp: new Date().toISOString(),
-            version: '1.0.0'
+            version: '1.0.1'
         });
     }
 };
