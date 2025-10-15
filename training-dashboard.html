@@ -364,7 +364,12 @@
 
         <!-- Registered Users List -->
         <div class="dashboard-card">
-            <h3><i class="fas fa-user-check"></i> Usuarios Registrados</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3><i class="fas fa-user-check"></i> Usuarios Registrados</h3>
+                <button class="btn-training btn-success" onclick="downloadUsersToExcel()" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-file-excel"></i> Exportar a Excel
+                </button>
+            </div>
             <div id="registeredUsersList">
                 <p>Loading registered users...</p>
             </div>
@@ -416,6 +421,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Excel Export Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script>
         class TrainingDashboard {
@@ -628,28 +636,72 @@
                     return;
                 }
 
-                const html = users.map((user, index) => `
-                    <div class="conversation-item" style="background: ${index % 2 === 0 ? '#f8fafc' : '#ffffff'};">
+                // Store users data globally for Excel export
+                window.registeredUsersData = users;
+
+                const html = users.map((user, index) => {
+                    const registrationDate = new Date(user.registrationDate);
+                    const daysAgo = Math.floor((new Date() - registrationDate) / (1000 * 60 * 60 * 24));
+                    
+                    return `
+                    <div class="conversation-item" style="background: ${index % 2 === 0 ? '#f8fafc' : '#ffffff'}; border-left: 4px solid #2563eb;">
                         <div class="conversation-header">
                             <span class="conversation-id">
-                                <i class="fas fa-user-circle" style="color: #2563eb;"></i> 
-                                <strong>${user.email}</strong>
+                                <i class="fas fa-user-circle" style="color: #2563eb; font-size: 1.2rem;"></i> 
+                                <strong style="color: #1e293b;">${user.name}</strong>
                             </span>
-                            <span class="conversation-timestamp">${new Date(user.registrationDate).toLocaleString()}</span>
+                            <span class="conversation-timestamp">
+                                <i class="fas fa-calendar-alt"></i> ${registrationDate.toLocaleString('es-ES')}
+                                ${daysAgo === 0 ? '<span style="background: #10b981; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px;">HOY</span>' : 
+                                  daysAgo === 1 ? '<span style="background: #3b82f6; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px;">AYER</span>' :
+                                  daysAgo <= 7 ? `<span style="background: #6366f1; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px;">Hace ${daysAgo} días</span>` : ''}
+                            </span>
                         </div>
-                        <div class="conversation-messages">
-                            <strong>Nombre:</strong> ${user.name} • 
-                            <strong>ID:</strong> ${user.userId || user.id}
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin: 0.75rem 0; padding: 0.75rem; background: rgba(37, 99, 235, 0.05); border-radius: 6px;">
+                            <div>
+                                <span style="color: #64748b; font-size: 0.85rem;">📧 Email:</span><br>
+                                <strong style="color: #1e293b; word-break: break-all;">${user.email}</strong>
+                            </div>
+                            <div>
+                                <span style="color: #64748b; font-size: 0.85rem;">🆔 User ID:</span><br>
+                                <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${user.userId || user.id}</code>
+                            </div>
+                            <div>
+                                <span style="color: #64748b; font-size: 0.85rem;">🔑 Database ID:</span><br>
+                                <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${user.id}</code>
+                            </div>
+                            <div>
+                                <span style="color: #64748b; font-size: 0.85rem;">⏱️ Tiempo activo:</span><br>
+                                <strong style="color: #1e293b;">${daysAgo === 0 ? 'Registrado hoy' : `${daysAgo} día${daysAgo !== 1 ? 's' : ''}`}</strong>
+                            </div>
                         </div>
                         <div class="conversation-feedback">
-                            <span style="color: #10b981;">
-                                <i class="fas fa-check-circle"></i> Usuario activo en prueba gratuita
+                            <span style="color: #10b981; font-weight: 600;">
+                                <i class="fas fa-check-circle"></i> Usuario activo en prueba gratuita MVP
                             </span>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
 
-                container.innerHTML = html;
+                container.innerHTML = `
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin: 0; color: white; font-size: 1.5rem;">
+                                    <i class="fas fa-users"></i> ${users.length} Usuario${users.length !== 1 ? 's' : ''} Registrado${users.length !== 1 ? 's' : ''}
+                                </h4>
+                                <p style="margin: 0.25rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">
+                                    Lista completa de usuarios en prueba gratuita del MVP
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 2.5rem; font-weight: 700;">${users.length}</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">TOTAL</div>
+                            </div>
+                        </div>
+                    </div>
+                    ${html}
+                `;
             }
 
             startAutoRefresh() {
@@ -853,18 +905,115 @@
                 const response = await fetch(`${apiBase}/training/export`);
                 const data = await response.json();
                 
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `h2go-training-data-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                // Crear workbook con múltiples hojas para entrenamiento
+                const wb = XLSX.utils.book_new();
+                
+                // Hoja 1: Resumen de Datos de Entrenamiento
+                const summaryData = [
+                    ['H2GO - Datos de Entrenamiento', ''],
+                    ['Fecha de Exportación:', new Date().toLocaleString('es-ES')],
+                    ['Versión:', data.version || '1.0'],
+                    ['', ''],
+                    ['ESTADÍSTICAS GENERALES', ''],
+                    ['Total Conversaciones:', data.conversations ? data.conversations.length : 0],
+                    ['Total Feedback:', data.feedback ? data.feedback.length : 0],
+                    ['Última Actualización:', new Date(data.exportDate).toLocaleString('es-ES')],
+                    ['', ''],
+                    ['DATOS PARA FINE-TUNING', ''],
+                    ['Conversaciones Válidas:', data.conversations ? data.conversations.filter(c => c.messages && c.messages.length > 2).length : 0],
+                    ['Feedback Positivo:', data.feedback ? data.feedback.filter(f => f.rating >= 4).length : 0],
+                    ['Feedback Negativo:', data.feedback ? data.feedback.filter(f => f.rating <= 2).length : 0],
+                    ['Rating Promedio:', data.feedback ? (data.feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / data.feedback.length).toFixed(2) : 'N/A']
+                ];
+                
+                const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+                summaryWs['!cols'] = [{ wch: 30 }, { wch: 20 }];
+                XLSX.utils.book_append_sheet(wb, summaryWs, 'Resumen');
+                
+                // Hoja 2: Conversaciones para Entrenamiento
+                if (data.conversations && data.conversations.length > 0) {
+                    const trainingConversations = data.conversations.map((conv, index) => ({
+                        'ID': index + 1,
+                        'Timestamp': new Date(conv.timestamp).toISOString(),
+                        'User': conv.user || 'anonymized',
+                        'Messages_Count': conv.messages ? conv.messages.length : 0,
+                        'Duration_Minutes': conv.duration || 0,
+                        'Type': conv.type || 'chat',
+                        'Status': conv.status || 'completed',
+                        'First_Message': conv.messages && conv.messages[0] ? conv.messages[0].content : 'N/A',
+                        'Last_Message': conv.messages && conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].content : 'N/A',
+                        'Full_Conversation': conv.messages ? conv.messages.map(m => `${m.role}: ${m.content}`).join(' | ') : 'N/A',
+                        'Recommended_Supplements': conv.recommendedSupplements || 'N/A',
+                        'User_Profile': conv.userProfile || 'N/A'
+                    }));
+                    
+                    const convWs = XLSX.utils.json_to_sheet(trainingConversations);
+                    convWs['!cols'] = [
+                        { wch: 5 }, { wch: 20 }, { wch: 15 }, { wch: 12 },
+                        { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 50 },
+                        { wch: 50 }, { wch: 100 }, { wch: 30 }, { wch: 30 }
+                    ];
+                    XLSX.utils.book_append_sheet(wb, convWs, 'Conversaciones');
+                }
+                
+                // Hoja 3: Feedback para Análisis
+                if (data.feedback && data.feedback.length > 0) {
+                    const feedbackData = data.feedback.map((feedback, index) => ({
+                        'ID': index + 1,
+                        'Timestamp': new Date(feedback.timestamp).toISOString(),
+                        'User': feedback.user || 'anonymized',
+                        'Conversation_ID': feedback.conversationId || 'N/A',
+                        'Rating': feedback.rating || 0,
+                        'Type': feedback.type || 'general',
+                        'Comment': feedback.comment || 'No comment',
+                        'Category': feedback.category || 'general',
+                        'Sentiment': feedback.sentiment || 'neutral',
+                        'Helpful': feedback.helpful || false,
+                        'Recommendations': feedback.recommendations || 'None',
+                        'Issues': feedback.issues || 'None',
+                        'Suggestions': feedback.suggestions || 'None'
+                    }));
+                    
+                    const feedbackWs = XLSX.utils.json_to_sheet(feedbackData);
+                    feedbackWs['!cols'] = [
+                        { wch: 5 }, { wch: 20 }, { wch: 15 }, { wch: 15 },
+                        { wch: 8 }, { wch: 12 }, { wch: 50 }, { wch: 15 },
+                        { wch: 12 }, { wch: 8 }, { wch: 30 }, { wch: 30 }, { wch: 30 }
+                    ];
+                    XLSX.utils.book_append_sheet(wb, feedbackWs, 'Feedback');
+                }
+                
+                // Hoja 4: Datos JSON Originales (para backup)
+                const jsonData = [
+                    ['Datos JSON Originales (para backup)', ''],
+                    ['', ''],
+                    ['JSON_DATA:', JSON.stringify(data, null, 2)]
+                ];
+                
+                const jsonWs = XLSX.utils.aoa_to_sheet(jsonData);
+                jsonWs['!cols'] = [{ wch: 100 }];
+                XLSX.utils.book_append_sheet(wb, jsonWs, 'JSON_Backup');
+                
+                // Descargar archivo Excel
+                const fileName = `h2go_training_data_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                alert(`✅ Datos de entrenamiento exportados: ${fileName}`);
+                
+                // También mantener la opción JSON para compatibilidad
+                const jsonBlob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const jsonUrl = URL.createObjectURL(jsonBlob);
+                const jsonA = document.createElement('a');
+                jsonA.href = jsonUrl;
+                jsonA.download = `h2go-training-data-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(jsonA);
+                jsonA.click();
+                document.body.removeChild(jsonA);
+                URL.revokeObjectURL(jsonUrl);
+                
             } catch (error) {
                 console.error('Failed to export training data:', error);
-                alert('Failed to export training data');
+                alert('❌ Error al exportar datos de entrenamiento. Revisa la consola para más detalles.');
             }
         }
 
@@ -906,19 +1055,387 @@
             }
         }
 
-        function downloadConversations() {
-            // Implementation for downloading conversations
-            alert('Conversations download feature coming soon!');
+        async function downloadConversations() {
+            try {
+                const dashboard = window.trainingDashboard;
+                if (!dashboard) {
+                    alert('Error: Dashboard no inicializado');
+                    return;
+                }
+
+                // Obtener datos de conversaciones
+                const response = await fetch(`${dashboard.apiBase}/analytics`);
+                const data = await response.json();
+                
+                if (!data.conversations) {
+                    alert('No hay conversaciones para exportar');
+                    return;
+                }
+
+                // Preparar datos para Excel
+                const conversationsData = data.conversations.map((conv, index) => ({
+                    'ID': index + 1,
+                    'Usuario': conv.user || 'Anónimo',
+                    'Fecha': new Date(conv.timestamp).toLocaleString('es-ES'),
+                    'Mensajes': conv.messages ? conv.messages.length : 0,
+                    'Duración (min)': conv.duration || 0,
+                    'Tipo': conv.type || 'Chat',
+                    'Estado': conv.status || 'Completado',
+                    'Feedback': conv.feedback || 'Sin feedback',
+                    'Primer Mensaje': conv.messages && conv.messages[0] ? conv.messages[0].content.substring(0, 100) + '...' : 'N/A',
+                    'Último Mensaje': conv.messages && conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].content.substring(0, 100) + '...' : 'N/A'
+                }));
+
+                // Crear workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(conversationsData);
+                
+                // Estilo de columnas
+                const colWidths = [
+                    { wch: 5 },   // ID
+                    { wch: 15 },  // Usuario
+                    { wch: 20 },  // Fecha
+                    { wch: 10 },  // Mensajes
+                    { wch: 12 },  // Duración
+                    { wch: 12 },  // Tipo
+                    { wch: 12 },  // Estado
+                    { wch: 15 },  // Feedback
+                    { wch: 30 },  // Primer Mensaje
+                    { wch: 30 }   // Último Mensaje
+                ];
+                ws['!cols'] = colWidths;
+
+                XLSX.utils.book_append_sheet(wb, ws, 'Conversaciones');
+                
+                // Descargar archivo
+                const fileName = `conversaciones_h2go_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                alert(`✅ Archivo Excel descargado: ${fileName}`);
+                
+            } catch (error) {
+                console.error('Error al exportar conversaciones:', error);
+                alert('❌ Error al exportar conversaciones. Revisa la consola para más detalles.');
+            }
         }
 
-        function downloadFeedback() {
-            // Implementation for downloading feedback
-            alert('Feedback download feature coming soon!');
+        async function downloadFeedback() {
+            try {
+                const dashboard = window.trainingDashboard;
+                if (!dashboard) {
+                    alert('Error: Dashboard no inicializado');
+                    return;
+                }
+
+                // Obtener datos de feedback
+                const response = await fetch(`${dashboard.apiBase}/analytics`);
+                const data = await response.json();
+                
+                if (!data.feedback || data.feedback.length === 0) {
+                    alert('No hay feedback para exportar');
+                    return;
+                }
+
+                // Preparar datos para Excel
+                const feedbackData = data.feedback.map((feedback, index) => ({
+                    'ID': index + 1,
+                    'Usuario': feedback.user || 'Anónimo',
+                    'Fecha': new Date(feedback.timestamp).toLocaleString('es-ES'),
+                    'Conversación ID': feedback.conversationId || 'N/A',
+                    'Rating': feedback.rating || 'Sin rating',
+                    'Tipo': feedback.type || 'General',
+                    'Comentario': feedback.comment || 'Sin comentario',
+                    'Categoría': feedback.category || 'General',
+                    'Sentimiento': feedback.sentiment || 'Neutral',
+                    'Útil': feedback.helpful ? 'Sí' : 'No',
+                    'Recomendaciones': feedback.recommendations || 'Ninguna',
+                    'Problemas': feedback.issues || 'Ninguno',
+                    'Sugerencias': feedback.suggestions || 'Ninguna'
+                }));
+
+                // Crear workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(feedbackData);
+                
+                // Estilo de columnas
+                const colWidths = [
+                    { wch: 5 },   // ID
+                    { wch: 15 },  // Usuario
+                    { wch: 20 },  // Fecha
+                    { wch: 15 },  // Conversación ID
+                    { wch: 8 },   // Rating
+                    { wch: 12 },  // Tipo
+                    { wch: 40 },  // Comentario
+                    { wch: 15 },  // Categoría
+                    { wch: 12 },  // Sentimiento
+                    { wch: 8 },   // Útil
+                    { wch: 25 },  // Recomendaciones
+                    { wch: 25 },  // Problemas
+                    { wch: 25 }   // Sugerencias
+                ];
+                ws['!cols'] = colWidths;
+
+                XLSX.utils.book_append_sheet(wb, ws, 'Feedback');
+                
+                // Descargar archivo
+                const fileName = `feedback_h2go_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                alert(`✅ Archivo Excel descargado: ${fileName}`);
+                
+            } catch (error) {
+                console.error('Error al exportar feedback:', error);
+                alert('❌ Error al exportar feedback. Revisa la consola para más detalles.');
+            }
         }
 
-        function generateReport() {
-            // Implementation for generating reports
-            alert('Report generation feature coming soon!');
+        async function downloadUsersToExcel() {
+            try {
+                const dashboard = window.trainingDashboard;
+                if (!dashboard) {
+                    alert('Error: Dashboard no inicializado');
+                    return;
+                }
+
+                // Obtener TODOS los usuarios
+                const response = await fetch(`${dashboard.apiBase}/users`);
+                const data = await response.json();
+                
+                if (!data.users || data.users.length === 0) {
+                    alert('No hay usuarios registrados para exportar');
+                    return;
+                }
+
+                // Preparar datos para Excel con TODOS los campos
+                const usersData = data.users.map((user, index) => {
+                    const registrationDate = new Date(user.registrationDate);
+                    const daysActive = Math.floor((new Date() - registrationDate) / (1000 * 60 * 60 * 24));
+                    
+                    return {
+                        'No.': index + 1,
+                        'Nombre Completo': user.name || 'N/A',
+                        'Email': user.email || 'N/A',
+                        'User ID': user.userId || user.id || 'N/A',
+                        'Database ID': user.id || 'N/A',
+                        'Fecha de Registro': registrationDate.toLocaleString('es-ES'),
+                        'Fecha ISO': user.registrationDate,
+                        'Días Activo': daysActive,
+                        'Estado': 'Prueba Gratuita MVP',
+                        'Tipo': 'Usuario MVP',
+                        'Plataforma': 'Web App H2GO'
+                    };
+                });
+
+                // Crear workbook con múltiples hojas
+                const wb = XLSX.utils.book_new();
+                
+                // Hoja 1: Lista de Usuarios
+                const ws = XLSX.utils.json_to_sheet(usersData);
+                
+                // Estilo de columnas
+                const colWidths = [
+                    { wch: 5 },   // No.
+                    { wch: 25 },  // Nombre
+                    { wch: 30 },  // Email
+                    { wch: 25 },  // User ID
+                    { wch: 20 },  // Database ID
+                    { wch: 20 },  // Fecha Registro
+                    { wch: 25 },  // Fecha ISO
+                    { wch: 12 },  // Días Activo
+                    { wch: 20 },  // Estado
+                    { wch: 15 },  // Tipo
+                    { wch: 15 }   // Plataforma
+                ];
+                ws['!cols'] = colWidths;
+
+                XLSX.utils.book_append_sheet(wb, ws, 'Usuarios Registrados');
+                
+                // Hoja 2: Resumen
+                const summaryData = [
+                    ['H2GO - Usuarios Registrados MVP', ''],
+                    ['Fecha de Exportación:', new Date().toLocaleString('es-ES')],
+                    ['', ''],
+                    ['ESTADÍSTICAS', ''],
+                    ['Total de Usuarios:', data.users.length],
+                    ['Usuarios Hoy:', usersData.filter(u => u['Días Activo'] === 0).length],
+                    ['Usuarios Última Semana:', usersData.filter(u => u['Días Activo'] <= 7).length],
+                    ['Usuarios Último Mes:', usersData.filter(u => u['Días Activo'] <= 30).length],
+                    ['', ''],
+                    ['INFORMACIÓN', ''],
+                    ['Producto:', 'H2GO - Supplement Intelligence'],
+                    ['Fase:', 'MVP - Prueba Gratuita'],
+                    ['Tipo de Registro:', 'Nombre + Email'],
+                    ['', ''],
+                    ['PRIMEROS 5 USUARIOS', ''],
+                    ['1.', data.users[0]?.name || 'N/A', data.users[0]?.email || 'N/A'],
+                    ['2.', data.users[1]?.name || 'N/A', data.users[1]?.email || 'N/A'],
+                    ['3.', data.users[2]?.name || 'N/A', data.users[2]?.email || 'N/A'],
+                    ['4.', data.users[3]?.name || 'N/A', data.users[3]?.email || 'N/A'],
+                    ['5.', data.users[4]?.name || 'N/A', data.users[4]?.email || 'N/A']
+                ];
+                
+                const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+                summaryWs['!cols'] = [{ wch: 30 }, { wch: 30 }, { wch: 30 }];
+                XLSX.utils.book_append_sheet(wb, summaryWs, 'Resumen');
+                
+                // Hoja 3: Análisis por Fecha
+                const dateAnalysis = [];
+                dateAnalysis.push(['Análisis de Registro por Fecha', '']);
+                dateAnalysis.push(['', '']);
+                
+                // Agrupar por fecha
+                const byDate = {};
+                data.users.forEach(user => {
+                    const date = new Date(user.registrationDate).toLocaleDateString('es-ES');
+                    byDate[date] = (byDate[date] || 0) + 1;
+                });
+                
+                dateAnalysis.push(['Fecha', 'Cantidad de Registros']);
+                Object.entries(byDate).sort((a, b) => new Date(b[0]) - new Date(a[0])).forEach(([date, count]) => {
+                    dateAnalysis.push([date, count]);
+                });
+                
+                const dateWs = XLSX.utils.aoa_to_sheet(dateAnalysis);
+                dateWs['!cols'] = [{ wch: 20 }, { wch: 20 }];
+                XLSX.utils.book_append_sheet(wb, dateWs, 'Análisis por Fecha');
+                
+                // Descargar archivo
+                const fileName = `usuarios_h2go_${new Date().toISOString().split('T')[0]}_${Date.now()}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                alert(`✅ Lista de usuarios exportada exitosamente!\n\n📊 Total de usuarios: ${data.users.length}\n📁 Archivo: ${fileName}\n\n✨ El archivo incluye:\n- Lista completa de usuarios\n- Resumen estadístico\n- Análisis por fecha de registro`);
+                
+            } catch (error) {
+                console.error('Error al exportar usuarios:', error);
+                alert('❌ Error al exportar usuarios. Revisa la consola para más detalles.');
+            }
+        }
+
+        async function generateReport() {
+            try {
+                const dashboard = window.trainingDashboard;
+                if (!dashboard) {
+                    alert('Error: Dashboard no inicializado');
+                    return;
+                }
+
+                // Obtener todos los datos
+                const response = await fetch(`${dashboard.apiBase}/analytics`);
+                const data = await response.json();
+                
+                // Crear workbook con múltiples hojas
+                const wb = XLSX.utils.book_new();
+                
+                // Hoja 1: Resumen Ejecutivo
+                const summaryData = [
+                    ['H2GO - Reporte de Analytics', ''],
+                    ['Fecha de Generación:', new Date().toLocaleString('es-ES')],
+                    ['', ''],
+                    ['MÉTRICAS PRINCIPALES', ''],
+                    ['Total Conversaciones:', data.totalConversations || 0],
+                    ['Total Usuarios:', data.totalUsers || 0],
+                    ['Total Feedback:', data.totalFeedback || 0],
+                    ['Tiempo Promedio de Conversación:', `${data.avgConversationTime || 0} minutos`],
+                    ['Rating Promedio:', data.avgRating || 'N/A'],
+                    ['', ''],
+                    ['ESTADÍSTICAS DE USO', ''],
+                    ['Conversaciones por Día:', data.conversationsPerDay || 0],
+                    ['Usuarios Activos:', data.activeUsers || 0],
+                    ['Tasa de Satisfacción:', `${data.satisfactionRate || 0}%`],
+                    ['Tasa de Retención:', `${data.retentionRate || 0}%`],
+                    ['', ''],
+                    ['TOP SUPLMENTOS RECOMENDADOS', ''],
+                    ['1. Proteína:', data.topSupplements?.protein || 'N/A'],
+                    ['2. Multivitamínicos:', data.topSupplements?.multivitamins || 'N/A'],
+                    ['3. Creatina:', data.topSupplements?.creatine || 'N/A'],
+                    ['4. Omega-3:', data.topSupplements?.omega3 || 'N/A'],
+                    ['5. Vitamina D:', data.topSupplements?.vitaminD || 'N/A']
+                ];
+                
+                const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+                summaryWs['!cols'] = [{ wch: 30 }, { wch: 20 }];
+                XLSX.utils.book_append_sheet(wb, summaryWs, 'Resumen Ejecutivo');
+                
+                // Hoja 2: Conversaciones Detalladas
+                if (data.conversations && data.conversations.length > 0) {
+                    const conversationsData = data.conversations.map((conv, index) => ({
+                        'ID': index + 1,
+                        'Usuario': conv.user || 'Anónimo',
+                        'Fecha': new Date(conv.timestamp).toLocaleString('es-ES'),
+                        'Mensajes': conv.messages ? conv.messages.length : 0,
+                        'Duración (min)': conv.duration || 0,
+                        'Tipo': conv.type || 'Chat',
+                        'Estado': conv.status || 'Completado',
+                        'Suplementos Recomendados': conv.recommendedSupplements || 'N/A'
+                    }));
+                    
+                    const convWs = XLSX.utils.json_to_sheet(conversationsData);
+                    convWs['!cols'] = [
+                        { wch: 5 }, { wch: 15 }, { wch: 20 }, { wch: 10 },
+                        { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 25 }
+                    ];
+                    XLSX.utils.book_append_sheet(wb, convWs, 'Conversaciones');
+                }
+                
+                // Hoja 3: Feedback Detallado
+                if (data.feedback && data.feedback.length > 0) {
+                    const feedbackData = data.feedback.map((feedback, index) => ({
+                        'ID': index + 1,
+                        'Usuario': feedback.user || 'Anónimo',
+                        'Fecha': new Date(feedback.timestamp).toLocaleString('es-ES'),
+                        'Rating': feedback.rating || 'Sin rating',
+                        'Tipo': feedback.type || 'General',
+                        'Comentario': feedback.comment || 'Sin comentario',
+                        'Categoría': feedback.category || 'General',
+                        'Útil': feedback.helpful ? 'Sí' : 'No'
+                    }));
+                    
+                    const feedbackWs = XLSX.utils.json_to_sheet(feedbackData);
+                    feedbackWs['!cols'] = [
+                        { wch: 5 }, { wch: 15 }, { wch: 20 }, { wch: 8 },
+                        { wch: 12 }, { wch: 40 }, { wch: 15 }, { wch: 8 }
+                    ];
+                    XLSX.utils.book_append_sheet(wb, feedbackWs, 'Feedback');
+                }
+                
+                // Hoja 4: Análisis de Tendencias
+                const trendsData = [
+                    ['ANÁLISIS DE TENDENCIAS', ''],
+                    ['', ''],
+                    ['PERÍODO DE ANÁLISIS:', 'Últimos 30 días'],
+                    ['', ''],
+                    ['CRECIMIENTO DE USUARIOS', ''],
+                    ['Nuevos Usuarios:', data.newUsers || 0],
+                    ['Usuarios Recurrentes:', data.recurringUsers || 0],
+                    ['Tasa de Crecimiento:', `${data.growthRate || 0}%`],
+                    ['', ''],
+                    ['PATRONES DE USO', ''],
+                    ['Hora Pico:', data.peakHour || 'N/A'],
+                    ['Día Más Activo:', data.peakDay || 'N/A'],
+                    ['Tiempo Promedio de Sesión:', `${data.avgSessionTime || 0} minutos`],
+                    ['', ''],
+                    ['SUPLEMENTOS MÁS POPULARES', ''],
+                    ['Proteína:', data.popularSupplements?.protein || 0],
+                    ['Multivitamínicos:', data.popularSupplements?.multivitamins || 0],
+                    ['Creatina:', data.popularSupplements?.creatine || 0],
+                    ['Omega-3:', data.popularSupplements?.omega3 || 0],
+                    ['Vitamina D:', data.popularSupplements?.vitaminD || 0]
+                ];
+                
+                const trendsWs = XLSX.utils.aoa_to_sheet(trendsData);
+                trendsWs['!cols'] = [{ wch: 30 }, { wch: 20 }];
+                XLSX.utils.book_append_sheet(wb, trendsWs, 'Análisis de Tendencias');
+                
+                // Descargar archivo
+                const fileName = `reporte_completo_h2go_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                alert(`✅ Reporte completo descargado: ${fileName}`);
+                
+            } catch (error) {
+                console.error('Error al generar reporte:', error);
+                alert('❌ Error al generar reporte. Revisa la consola para más detalles.');
+            }
         }
 
         // Initialize dashboard when page loads
