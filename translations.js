@@ -497,8 +497,23 @@ class LanguageManager {
             localStorage.setItem('h2go_language', lang);
             this.applyTranslations();
             
-            // Reload the page to apply all changes
-            window.location.reload();
+            // Update chat messages if the app is running
+            if (window.h2goApp) {
+                window.h2goApp.updateChatLanguage();
+            }
+            
+            // Update language selector buttons
+            this.updateLanguageSelector();
+        }
+    }
+    
+    updateLanguageSelector() {
+        const selector = document.querySelector('.language-selector');
+        if (selector) {
+            selector.querySelectorAll('.lang-btn').forEach(btn => {
+                const btnLang = btn.getAttribute('data-lang');
+                btn.classList.toggle('active', btnLang === this.currentLang);
+            });
         }
     }
     

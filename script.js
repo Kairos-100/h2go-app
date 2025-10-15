@@ -1162,6 +1162,68 @@ class H2GOApp {
         }
     }
 
+    updateChatLanguage() {
+        // Update the chat input placeholder
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.placeholder = this.t('quest_placeholder');
+        }
+        
+        // Update existing bot messages that have translation keys
+        const chatMessages = document.getElementById('chatMessages');
+        if (chatMessages) {
+            const messages = chatMessages.querySelectorAll('.bot-message .message-content p');
+            messages.forEach(message => {
+                const text = message.textContent.trim();
+                
+                // Update greeting message
+                if (text.includes("Hi! I'm your H2GO assistant") || 
+                    text.includes("¡Hola! Soy tu asistente H2GO") ||
+                    text.includes("안녕하세요! H2GO 어시스턴트입니다")) {
+                    message.textContent = this.t('chat_greeting');
+                }
+                // Update registration required message
+                else if (text.includes("To continue, I need you to register") ||
+                         text.includes("Para continuar, necesito que te registres") ||
+                         text.includes("계속하려면 먼저 등록이 필요합니다")) {
+                    message.textContent = this.t('msg_registration_required');
+                }
+                // Update analyzing message
+                else if (text.includes("Analyzing your data") ||
+                         text.includes("Analizando tus datos") ||
+                         text.includes("데이터 분석 중")) {
+                    message.textContent = this.t('msg_analyzing');
+                }
+                // Update plan ready message
+                else if (text.includes("Your personalized supplement plan is ready") ||
+                         text.includes("Tu plan personalizado de suplementos está listo") ||
+                         text.includes("맞춤형 보충제 플랜이 준비되었습니다")) {
+                    message.textContent = this.t('msg_plan_ready');
+                }
+            });
+            
+            // Update registration prompt if it exists
+            const registrationPrompt = chatMessages.querySelector('.registration-prompt-chat h4');
+            if (registrationPrompt) {
+                if (registrationPrompt.textContent.includes("Registro rápido requerido") ||
+                    registrationPrompt.textContent.includes("Quick registration required") ||
+                    registrationPrompt.textContent.includes("빠른 등록 필요")) {
+                    registrationPrompt.textContent = "📝 " + this.t('reg_welcome');
+                }
+            }
+            
+            // Update feedback form if it exists
+            const feedbackTitle = chatMessages.querySelector('.feedback-chat-card h4');
+            if (feedbackTitle) {
+                if (feedbackTitle.textContent.includes("Help us improve") ||
+                    feedbackTitle.textContent.includes("Ayúdanos a mejorar") ||
+                    feedbackTitle.textContent.includes("개선에 도움을 주세요")) {
+                    feedbackTitle.textContent = "📊 " + this.t('feedback_title');
+                }
+            }
+        }
+    }
+
 }
 
 // Chat feedback submission function
