@@ -1,0 +1,71 @@
+[
+  {
+    "sessionId": "real_user_001",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hola, quiero consejos sobre suplementos para correr"
+      },
+      {
+        "role": "assistant",
+        "content": "¡Hola! Estoy aquí para ayudarte con eso. Empecemos con algunas preguntas para conocer mejor tu perfil como corredor:\n\n1. ¿Cuál es tu altura y peso?\n2. ¿Cuántos kilómetros corres aproximadamente por semana?\n3. ¿Cuál es tu nivel de experiencia en la carrera?\n4. ¿Cuáles son tus objetivos al correr?\n5. ¿Tienes alguna restricción dietética que deba tener en cuenta?"
+      }
+    ],
+    "userData": {},
+    "action": "continue",
+    "context": "supplement_questionnaire",
+    "timestamp": "2025-10-14T09:25:53.078Z",
+    "id": "mgqcx7p3db8i2cc4qpp"
+  },
+  {
+    "sessionId": "real_user_001",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hola, quiero consejos sobre suplementos para correr"
+      },
+      {
+        "role": "assistant",
+        "content": "¡Hola! Estoy aquí para ayudarte con eso. Empecemos con algunas preguntas para conocer mejor tu perfil como corredor:\n\n1. ¿Cuál es tu altura y peso?\n2. ¿Cuántos kilómetros corres aproximadamente por semana?\n3. ¿Cuál es tu nivel de experiencia en la carrera?\n4. ¿Cuáles son tus objetivos al correr?\n5. ¿Tienes alguna restricción dietética que deba tener en cuenta?"
+      },
+      {
+        "role": "user",
+        "content": "Mido 175 cm y peso 70 kg"
+      },
+      {
+        "role": "assistant",
+        "content": "Gracias por la información. ¿Cuántos kilómetros corres aproximadamente por semana?"
+      }
+    ],
+    "userData": {
+      "height": "175",
+      "weight": "70"
+    },
+    "action": "next_question",
+    "context": "supplement_questionnaire",
+    "timestamp": "2025-10-14T09:26:08.218Z",
+    "id": "mgqcxjdmzsi3ocgd98"
+  },
+  {
+    "sessionId": "anonymous",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hola, quiero encontrar una manera de suplementarme en una media maraton"
+      },
+      {
+        "role": "user",
+        "content": "Hola, quiero encontrar una manera de suplementarme en una media maraton"
+      },
+      {
+        "role": "assistant",
+        "content": "¡Hola! ¡Qué emocionante que estés planeando correr una media maratón! Para poder recomendarte los mejores suplementos, necesitaría conocer un poco más sobre ti. ¿Podrías proporcionarme la siguiente información?\n1. Altura y peso:\n2. Distancia semanal de tus entrenamientos:\n3. Nivel de experiencia como corredor:\n4. Tus objetivos para la media maratón:\n5. Restricciones dietéticas que tengas:"
+      }
+    ],
+    "userData": {},
+    "action": "continue",
+    "context": "supplement_questionnaire",
+    "timestamp": "2025-10-14T09:30:46.385Z",
+    "id": "mgqd3i0hgyeztyxvgon"
+  }
+]

@@ -1,0 +1,61 @@
+# Vercel ignore file
+# Files and directories to ignore during deployment
+
+# Node modules
+node_modules/
+
+# Training data (use database instead)
+training-data/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+
+# Environment files (already configured in Vercel)
+.env
+.env.local
+.env.*.local
+
+# Documentation that doesn't need to be deployed
+*.md
+!README.md
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Development scripts
+setup.sh
+generate-icons.js
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.js
+*.spec.js
+

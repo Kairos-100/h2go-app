@@ -1,0 +1,90 @@
+[
+  {
+    "sessionId": "session_1760436712333_067nl0e47",
+    "conversationId": "conv_1760436898593",
+    "rating": 3,
+    "comment": "I would like more especific suplements, and when to take them while running, before after...",
+    "userType": "advanced",
+    "goal": "performance",
+    "userData": {
+      "height": "180",
+      "weight": "50",
+      "runningDistance": "40",
+      "runningExperience": "advanced",
+      "goals": "performance",
+      "dietaryRestrictions": ""
+    },
+    "conversationHistory": [
+      {
+        "role": "user",
+        "content": "Height: 180 cm"
+      },
+      {
+        "role": "user",
+        "content": "Weight: 50 kg"
+      },
+      {
+        "role": "user",
+        "content": "Weekly Running Distance: 40 km per week"
+      },
+      {
+        "role": "user",
+        "content": "Running Experience: Advanced (2+ years)"
+      },
+      {
+        "role": "user",
+        "content": "Primary Running Goals: Performance Improvement"
+      }
+    ],
+    "timestamp": "2025-10-14T10:14:58.648Z",
+    "feedbackType": "comprehensive",
+    "type": "comprehensive_feedback",
+    "id": "mgqeocih4vmw30s0r78"
+  },
+  {
+    "sessionId": "session_1760446580539_ufmblue4o",
+    "conversationId": "conv_1760446760682",
+    "rating": 2,
+    "comment": "I need a better plan daily",
+    "userType": "intermediate",
+    "goal": "general-fitness",
+    "userData": {
+      "height": "190",
+      "weight": "90",
+      "runningDistance": "25",
+      "runningExperience": "intermediate",
+      "goals": "performance",
+      "dietaryRestrictions": "Vegetaliano"
+    },
+    "conversationHistory": [
+      {
+        "role": "user",
+        "content": "Height: 190 cm"
+      },
+      {
+        "role": "user",
+        "content": "Weight: 90 kg"
+      },
+      {
+        "role": "user",
+        "content": "Weekly distance: 25 km"
+      },
+      {
+        "role": "user",
+        "content": "Running experience: Intermediate (6 months - 2 years)"
+      },
+      {
+        "role": "user",
+        "content": "Primary goal: Performance Improvement"
+      },
+      {
+        "role": "user",
+        "content": "Dietary restrictions: Vegetaliano"
+      }
+    ],
+    "timestamp": "2025-10-14T12:59:20.694Z",
+    "feedbackType": "comprehensive",
+    "type": "comprehensive_feedback",
+    "id": "mgqkjq46wwugin4x5wq"
+  }
+]

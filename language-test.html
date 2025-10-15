@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H2GO - Language Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="translations.js"></script>
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        .test-item {
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #2563eb;
+        }
+        .lang-info {
+            background: #eff6ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🌍 H2GO Language System Test</h1>
+        
+        <div class="lang-info">
+            <strong>Current Language:</strong> <span id="currentLang">Loading...</span><br>
+            <strong>Browser Language:</strong> <span id="browserLang">Loading...</span><br>
+            <strong>Saved Language:</strong> <span id="savedLang">Loading...</span>
+        </div>
+
+        <div class="test-section">
+            <h2>Navigation Test</h2>
+            <div class="test-item">
+                <strong>Home:</strong> <span data-i18n="nav_home">Home</span>
+            </div>
+            <div class="test-item">
+                <strong>How It Works:</strong> <span data-i18n="nav_how_it_works">How It Works</span>
+            </div>
+            <div class="test-item">
+                <strong>Get Started:</strong> <span data-i18n="nav_get_started">Get Started</span>
+            </div>
+            <div class="test-item">
+                <strong>Contact:</strong> <span data-i18n="nav_contact">Contact</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Hero Section Test</h2>
+            <div class="test-item">
+                <strong>Title:</strong> <span data-i18n="hero_title">Supplementation Intelligence for Amateur Runners</span>
+            </div>
+            <div class="test-item">
+                <strong>Start Button:</strong> <span data-i18n="hero_btn_start">Start Your Journey</span>
+            </div>
+            <div class="test-item">
+                <strong>Learn More Button:</strong> <span data-i18n="hero_btn_learn">Learn More</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Chat Messages Test</h2>
+            <div class="test-item">
+                <strong>Greeting:</strong> <span data-i18n="chat_greeting">Hi! I'm your H2GO assistant...</span>
+            </div>
+            <div class="test-item">
+                <strong>Height Question:</strong> <span data-i18n="chat_height">What's your height in centimeters?</span>
+            </div>
+            <div class="test-item">
+                <strong>Weight Question:</strong> <span data-i18n="chat_weight">What's your weight in kilograms?</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Form Labels Test</h2>
+            <div class="test-item">
+                <strong>Beginner:</strong> <span data-i18n="exp_beginner">Beginner (0-6 months)</span>
+            </div>
+            <div class="test-item">
+                <strong>Intermediate:</strong> <span data-i18n="exp_intermediate">Intermediate (6 months - 2 years)</span>
+            </div>
+            <div class="test-item">
+                <strong>Advanced:</strong> <span data-i18n="exp_advanced">Advanced (2+ years)</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Goals Test</h2>
+            <div class="test-item">
+                <strong>Weight Loss:</strong> <span data-i18n="goal_weight_loss">Weight Loss</span>
+            </div>
+            <div class="test-item">
+                <strong>Endurance:</strong> <span data-i18n="goal_endurance">Endurance Building</span>
+            </div>
+            <div class="test-item">
+                <strong>Performance:</strong> <span data-i18n="goal_performance">Performance Improvement</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Manual Language Switch Test</h2>
+            <p>Use the floating language selector in the top-right corner to switch languages.</p>
+            <p>The page will reload and all text should update to the selected language.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>JavaScript Translation Test</h2>
+            <button class="btn-primary" onclick="testJSTranslation()">Test JS Translation</button>
+            <div id="jsTestResult" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="index.html" class="btn-primary">← Back to Main App</a>
+        </div>
+    </div>
+
+    <script>
+        // Display language information
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize language manager
+            window.languageManager = new LanguageManager();
+            
+            // Display info
+            document.getElementById('currentLang').textContent = window.languageManager.currentLang.toUpperCase();
+            document.getElementById('browserLang').textContent = navigator.language || navigator.userLanguage;
+            document.getElementById('savedLang').textContent = localStorage.getItem('h2go_language') || 'None';
+        });
+
+        function testJSTranslation() {
+            const result = document.getElementById('jsTestResult');
+            const lm = window.languageManager;
+            
+            result.innerHTML = `
+                <div style="background: white; padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+                    <strong>Translation Test Results:</strong><br><br>
+                    <strong>nav_home:</strong> ${lm.translate('nav_home')}<br>
+                    <strong>hero_title:</strong> ${lm.translate('hero_title')}<br>
+                    <strong>chat_greeting:</strong> ${lm.translate('chat_greeting')}<br>
+                    <strong>feedback_title:</strong> ${lm.translate('feedback_title')}<br>
+                    <strong>val_rating:</strong> ${lm.translate('val_rating')}<br>
+                </div>
+            `;
+        }
+
+        // Add console logging
+        console.log('Language Test Page Loaded');
+        console.log('Browser Language:', navigator.language);
+        console.log('Translations Available:', Object.keys(translations));
+    </script>
+</body>
+</html>
+

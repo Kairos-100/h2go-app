@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H2GO Training Dashboard</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="H2GO Training Dashboard - Monitor and improve your AI supplement advisor">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="H2GO Dashboard">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icons for PWA -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-card h3 {
+            color: #2563eb;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 1rem;
+        }
+        
+        .training-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-training {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .conversation-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .conversation-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8fafc;
+        }
+        
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .conversation-id {
+            font-weight: 600;
+            color: #2563eb;
+        }
+        
+        .conversation-timestamp {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+        
+        .conversation-messages {
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+        
+        .conversation-feedback {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .rating-stars {
+            color: #fbbf24;
+        }
+        
+        .no-feedback {
+            color: #94a3b8;
+            font-style: italic;
+        }
+        
+        .feedback-form {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .feedback-form h4 {
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        .feedback-inputs {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .rating-input {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .rating-input input[type="radio"] {
+            display: none;
+        }
+        
+        .rating-input label {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #d1d5db;
+            transition: color 0.2s;
+        }
+        
+        .rating-input label:hover,
+        .rating-input input:checked + label {
+            color: #fbbf24;
+        }
+        
+        .comment-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+        
+        .export-section {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .export-section h3 {
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-online {
+            background: #10b981;
+        }
+        
+        .status-offline {
+            background: #ef4444;
+        }
+        
+        .status-warning {
+            background: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>H2GO Training Dashboard</h1>
+            <p>Monitor and improve your AI supplement advisor</p>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-users"></i> Usuarios Registrados</h3>
+                <div class="metric-value" id="totalUsers">-</div>
+                <div class="metric-label">Total de usuarios en prueba gratuita</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3><i class="fas fa-comments"></i> Total Conversations</h3>
+                <div class="metric-value" id="totalConversations">-</div>
+                <div class="metric-label">All time conversations</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3><i class="fas fa-star"></i> Average Rating</h3>
+                <div class="metric-value" id="averageRating">-</div>
+                <div class="metric-label">User satisfaction score</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3><i class="fas fa-thumbs-up"></i> Total Feedback</h3>
+                <div class="metric-value" id="totalFeedback">-</div>
+                <div class="metric-label">User feedback entries</div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3><i class="fas fa-file-upload"></i> Documents Uploaded</h3>
+                <div class="metric-value" id="totalDocuments">-</div>
+                <div class="metric-label">Training documents</div>
+            </div>
+        </div>
+
+        <!-- Learning Sources -->
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 2rem;">
+            <h3 style="color: white;"><i class="fas fa-brain"></i> Fuentes de Aprendizaje Activas</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="font-size: 2rem; font-weight: 700;" id="feedbackLearning">-</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">📝 Feedback de Usuarios</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="font-size: 2rem; font-weight: 700;" id="documentLearning">-</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">📄 Documentos Procesados</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="font-size: 2rem; font-weight: 700;" id="totalDataPoints">-</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">🎯 Puntos de Datos Totales</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="font-size: 2rem; font-weight: 700;" id="learningStatus">✅</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">🤖 Estado del Aprendizaje</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-chart-bar"></i> Rating Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="ratingChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Questions -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-question-circle"></i> Most Common Questions</h3>
+            <div id="commonQuestions">
+                <p>Loading common questions...</p>
+            </div>
+        </div>
+
+        <!-- Recent Conversations -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-history"></i> Recent Conversations</h3>
+            <div class="conversation-list" id="recentConversations">
+                <p>Loading conversations...</p>
+            </div>
+        </div>
+
+        <!-- Detailed Feedback Section -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-comment-dots"></i> Feedback Detallado de Usuarios</h3>
+            <div id="feedbackDetails">
+                <p>Loading feedback...</p>
+            </div>
+        </div>
+
+        <!-- Uploaded Documents Section -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-file-alt"></i> Documentos de Entrenamiento</h3>
+            <div id="documentsDetails">
+                <p>Loading documents...</p>
+            </div>
+        </div>
+
+        <!-- Registered Users List -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-user-check"></i> Usuarios Registrados</h3>
+            <div id="registeredUsersList">
+                <p>Loading registered users...</p>
+            </div>
+        </div>
+
+        <!-- User Insights -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-chart-line"></i> Insights de Usuarios</h3>
+            <div id="userInsights">
+                <p>Loading user data...</p>
+            </div>
+        </div>
+
+        <!-- Training Actions -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-cogs"></i> Training Actions</h3>
+            <div class="training-actions">
+                <button class="btn-training btn-primary" onclick="refreshAnalytics()">
+                    <i class="fas fa-sync"></i> Refresh Data
+                </button>
+                <button class="btn-training btn-success" onclick="exportTrainingData()">
+                    <i class="fas fa-download"></i> Export Training Data
+                </button>
+                <button class="btn-training btn-warning" onclick="prepareFineTune()">
+                    <i class="fas fa-brain"></i> Prepare Fine-tuning
+                </button>
+                <button class="btn-training btn-secondary" onclick="viewAPIHealth()">
+                    <i class="fas fa-heartbeat"></i> Check API Health
+                </button>
+                <button class="btn-training btn-primary" onclick="window.location.href='document-upload.html'" style="background: #10b981;">
+                    <i class="fas fa-file-upload"></i> Upload Documents
+                </button>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3><i class="fas fa-database"></i> Data Export & Management</h3>
+            <div class="export-options">
+                <button class="btn-training btn-primary" onclick="downloadConversations()">
+                    <i class="fas fa-file-export"></i> Download Conversations
+                </button>
+                <button class="btn-training btn-secondary" onclick="downloadFeedback()">
+                    <i class="fas fa-comment-dots"></i> Download Feedback
+                </button>
+                <button class="btn-training btn-success" onclick="generateReport()">
+                    <i class="fas fa-file-alt"></i> Generate Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TrainingDashboard {
+            constructor() {
+                // Auto-detect API endpoint (works in both local and production)
+                this.apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'http://localhost:3000/api'
+                    : '/api';
+                this.charts = {};
+                this.init();
+            }
+
+            async init() {
+                await this.loadAnalytics();
+                await this.loadDocumentStats();
+                await this.loadFeedbackDetails();
+                await this.loadUserInsights();
+                await this.loadRegisteredUsers();
+                await this.checkAPIHealth();
+                this.setupCharts();
+                this.startAutoRefresh();
+            }
+
+            async loadAnalytics() {
+                try {
+                    const response = await fetch(`${this.apiBase}/analytics`);
+                    const data = await response.json();
+                    
+                    this.updateMetrics(data);
+                    this.updateCommonQuestions(data.commonQuestions);
+                    this.updateRecentConversations(data.recentActivity);
+                    this.updateCharts(data);
+                    
+                } catch (error) {
+                    console.error('Failed to load analytics:', error);
+                    this.showError('Failed to load analytics data');
+                }
+            }
+
+            updateMetrics(data) {
+                document.getElementById('totalUsers').textContent = data.totalUsers || 0;
+                document.getElementById('totalConversations').textContent = data.totalConversations || 0;
+                document.getElementById('averageRating').textContent = (data.averageRating || 0).toFixed(1);
+                document.getElementById('totalFeedback').textContent = data.totalFeedback || 0;
+                
+                // Update learning sources
+                document.getElementById('feedbackLearning').textContent = data.totalFeedback || 0;
+            }
+
+            updateCommonQuestions(questions) {
+                const container = document.getElementById('commonQuestions');
+                if (!questions || questions.length === 0) {
+                    container.innerHTML = '<p>No common questions data available</p>';
+                    return;
+                }
+
+                const html = questions.slice(0, 10).map((q, index) => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0;">
+                        <span>${index + 1}. ${q.question}</span>
+                        <span style="color: #64748b; font-size: 0.9rem;">${q.count} times</span>
+                    </div>
+                `).join('');
+
+                container.innerHTML = html;
+            }
+
+            updateRecentConversations(conversations) {
+                const container = document.getElementById('recentConversations');
+                if (!conversations || conversations.length === 0) {
+                    container.innerHTML = '<p>No recent conversations available</p>';
+                    return;
+                }
+
+                const html = conversations.map(conv => `
+                    <div class="conversation-item">
+                        <div class="conversation-header">
+                            <span class="conversation-id">
+                                <i class="fas fa-user-circle"></i> ${conv.userEmail || 'anonymous'}
+                            </span>
+                            <span class="conversation-timestamp">${new Date(conv.timestamp).toLocaleString()}</span>
+                        </div>
+                        <div class="conversation-messages">
+                            <strong>${conv.userName || 'Anonymous User'}</strong> • ${conv.messageCount} mensajes
+                        </div>
+                        <div class="conversation-feedback">
+                            ${conv.hasFeedback ? 
+                                '<span class="rating-stars">★★★★★</span><span>Has feedback</span>' : 
+                                '<span class="no-feedback">No feedback yet</span>'
+                            }
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = html;
+            }
+
+            setupCharts() {
+                // Rating Distribution Chart
+                const ratingCtx = document.getElementById('ratingChart').getContext('2d');
+                this.charts.rating = new Chart(ratingCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+                        datasets: [{
+                            data: [0, 0, 0, 0, 0],
+                            backgroundColor: ['#ef4444', '#f59e0b', '#eab308', '#22c55e', '#10b981']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+
+                // Activity Chart
+                const activityCtx = document.getElementById('activityChart').getContext('2d');
+                this.charts.activity = new Chart(activityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Conversations',
+                            data: [],
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            updateCharts(data) {
+                // Update rating chart (placeholder data - would need actual rating distribution)
+                if (this.charts.rating) {
+                    this.charts.rating.data.datasets[0].data = [2, 3, 8, 15, 17]; // Example data
+                    this.charts.rating.update();
+                }
+
+                // Update activity chart (placeholder data - would need actual time series data)
+                if (this.charts.activity) {
+                    const labels = [];
+                    const values = [];
+                    for (let i = 6; i >= 0; i--) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        labels.push(date.toLocaleDateString());
+                        values.push(Math.floor(Math.random() * 10) + 5);
+                    }
+                    
+                    this.charts.activity.data.labels = labels;
+                    this.charts.activity.data.datasets[0].data = values;
+                    this.charts.activity.update();
+                }
+            }
+
+            async checkAPIHealth() {
+                try {
+                    const response = await fetch(`${this.apiBase}/chat/health`);
+                    const data = await response.json();
+                    
+                    const statusIndicator = document.getElementById('apiStatus');
+                    const statusText = document.getElementById('apiStatusText');
+                    
+                    if (data.status === 'OK') {
+                        statusIndicator.className = 'status-indicator status-online';
+                        statusText.textContent = 'Online';
+                    } else {
+                        statusIndicator.className = 'status-indicator status-warning';
+                        statusText.textContent = 'Warning';
+                    }
+                } catch (error) {
+                    const statusIndicator = document.getElementById('apiStatus');
+                    const statusText = document.getElementById('apiStatusText');
+                    
+                    statusIndicator.className = 'status-indicator status-offline';
+                    statusText.textContent = 'Offline';
+                }
+            }
+
+            async loadRegisteredUsers() {
+                try {
+                    const response = await fetch(`${this.apiBase}/users/stats`);
+                    const stats = await response.json();
+                    
+                    this.displayRegisteredUsers(stats.recentUsers || []);
+                } catch (error) {
+                    console.error('Registered users error:', error);
+                    document.getElementById('registeredUsersList').innerHTML = '<p style="color: #64748b;">No se pudieron cargar los usuarios registrados.</p>';
+                }
+            }
+
+            displayRegisteredUsers(users) {
+                const container = document.getElementById('registeredUsersList');
+                if (!users || users.length === 0) {
+                    container.innerHTML = '<p style="color: #64748b;">No hay usuarios registrados todavía.</p>';
+                    return;
+                }
+
+                const html = users.map((user, index) => `
+                    <div class="conversation-item" style="background: ${index % 2 === 0 ? '#f8fafc' : '#ffffff'};">
+                        <div class="conversation-header">
+                            <span class="conversation-id">
+                                <i class="fas fa-user-circle" style="color: #2563eb;"></i> 
+                                <strong>${user.email}</strong>
+                            </span>
+                            <span class="conversation-timestamp">${new Date(user.registrationDate).toLocaleString()}</span>
+                        </div>
+                        <div class="conversation-messages">
+                            <strong>Nombre:</strong> ${user.name} • 
+                            <strong>ID:</strong> ${user.userId || user.id}
+                        </div>
+                        <div class="conversation-feedback">
+                            <span style="color: #10b981;">
+                                <i class="fas fa-check-circle"></i> Usuario activo en prueba gratuita
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = html;
+            }
+
+            startAutoRefresh() {
+                // Refresh every 30 seconds
+                setInterval(() => {
+                    this.loadAnalytics();
+                    this.loadDocumentStats();
+                    this.loadFeedbackDetails();
+                    this.loadUserInsights();
+                    this.loadRegisteredUsers();
+                    this.checkAPIHealth();
+                }, 30000);
+            }
+
+            async loadDocumentStats() {
+                try {
+                    const response = await fetch(`${this.apiBase}/documents/stats`);
+                    const stats = await response.json();
+                    
+                    document.getElementById('totalDocuments').textContent = stats.totalDocuments || 0;
+                    document.getElementById('documentLearning').textContent = stats.totalDocuments || 0;
+                    document.getElementById('totalDataPoints').textContent = 
+                        (stats.trainingDataPoints || 0) + (parseInt(document.getElementById('feedbackLearning').textContent) || 0);
+                    
+                    // Load recent documents
+                    const docsResponse = await fetch(`${this.apiBase}/documents/recent?limit=5`);
+                    const recentDocs = await docsResponse.json();
+                    this.displayDocuments(recentDocs);
+                } catch (error) {
+                    console.error('Document stats error:', error);
+                    document.getElementById('totalDocuments').textContent = '0';
+                    document.getElementById('documentLearning').textContent = '0';
+                }
+            }
+
+            displayDocuments(documents) {
+                const container = document.getElementById('documentsDetails');
+                if (!documents || documents.length === 0) {
+                    container.innerHTML = '<p style="color: #64748b;">No hay documentos subidos todavía. <a href="document-upload.html">Subir documentos</a></p>';
+                    return;
+                }
+
+                const html = documents.map(doc => `
+                    <div class="conversation-item">
+                        <div class="conversation-header">
+                            <span class="conversation-id"><i class="fas fa-file"></i> ${doc.filename}</span>
+                            <span class="conversation-timestamp">${new Date(doc.uploadDate).toLocaleString()}</span>
+                        </div>
+                        <div class="conversation-messages">
+                            <strong>Tipo:</strong> ${doc.contentType} • 
+                            <strong>Datos extraídos:</strong> ${doc.dataPoints || 0} puntos
+                        </div>
+                        <div class="conversation-feedback">
+                            <span style="color: #10b981;"><i class="fas fa-check-circle"></i> Procesado correctamente</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = html;
+            }
+
+            async loadFeedbackDetails() {
+                try {
+                    const response = await fetch(`${this.apiBase}/training/export`);
+                    const data = await response.json();
+                    
+                    const feedbackList = data.feedback || [];
+                    this.displayFeedbackDetails(feedbackList);
+                } catch (error) {
+                    console.error('Feedback details error:', error);
+                }
+            }
+
+            displayFeedbackDetails(feedbackList) {
+                const container = document.getElementById('feedbackDetails');
+                if (!feedbackList || feedbackList.length === 0) {
+                    container.innerHTML = '<p style="color: #64748b;">No hay feedback de usuarios todavía.</p>';
+                    return;
+                }
+
+                const recentFeedback = feedbackList.slice(-10).reverse();
+                const html = recentFeedback.map(fb => {
+                    const stars = '⭐'.repeat(fb.rating || 0);
+                    const userType = fb.userType || fb.userData?.runningExperience || 'Unknown';
+                    const goal = fb.goal || fb.userData?.goals || 'Not specified';
+                    const userEmail = fb.userEmail || fb.registeredUser?.email || 'anonymous';
+                    const userName = fb.userName || fb.registeredUser?.name || 'Anonymous User';
+                    
+                    return `
+                        <div class="conversation-item">
+                            <div class="conversation-header">
+                                <span class="conversation-id">
+                                    ${stars} (${fb.rating}/5) • <i class="fas fa-envelope"></i> ${userEmail}
+                                </span>
+                                <span class="conversation-timestamp">${new Date(fb.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div class="conversation-messages">
+                                <strong>Usuario:</strong> ${userName} (${userType}) • 
+                                <strong>Objetivo:</strong> ${goal}
+                                ${fb.comment ? '<br><strong>Comentario:</strong> ' + fb.comment : ''}
+                            </div>
+                            <div class="conversation-feedback">
+                                <span style="color: #2563eb;">
+                                    <i class="fas fa-brain"></i> Usado para aprendizaje
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = html;
+            }
+
+            async loadUserInsights() {
+                try {
+                    const response = await fetch(`${this.apiBase}/learning-analytics`);
+                    const analytics = await response.json();
+                    
+                    this.displayUserInsights(analytics);
+                } catch (error) {
+                    console.error('User insights error:', error);
+                }
+            }
+
+            displayUserInsights(analytics) {
+                const container = document.getElementById('userInsights');
+                
+                const userTypePrefs = analytics.userTypeInsights || {};
+                const successPatterns = analytics.successfulPatterns || [];
+                const learningState = analytics.learningState || {};
+
+                let html = '<div style="display: grid; gap: 1rem;">';
+
+                // User type preferences
+                if (Object.keys(userTypePrefs).length > 0) {
+                    html += '<div><h4 style="color: #1e293b; margin-bottom: 0.5rem;">Tipos de Usuarios:</h4>';
+                    for (const [type, data] of Object.entries(userTypePrefs)) {
+                        html += `
+                            <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.5rem;">
+                                <strong>${type}:</strong> ${data.total} usuarios • 
+                                Satisfacción promedio: ${(data.averageRating || 0).toFixed(1)}⭐
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                }
+
+                // Learning status
+                if (learningState.totalFeedback > 0) {
+                    html += `
+                        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: white; margin-bottom: 0.5rem;">🎯 Estado del Sistema de Aprendizaje</h4>
+                            <p style="margin: 0;">
+                                <strong>Total Feedback:</strong> ${learningState.totalFeedback} • 
+                                <strong>Rating Promedio:</strong> ${(learningState.averageRating || 0).toFixed(1)}⭐ • 
+                                <strong>Última Actualización:</strong> ${new Date(learningState.lastUpdated).toLocaleString()}
+                            </p>
+                        </div>
+                    `;
+                    
+                    document.getElementById('learningStatus').textContent = learningState.totalFeedback > 0 ? '✅ ACTIVO' : '⏸️';
+                } else {
+                    html += `
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; text-align: center; color: #64748b;">
+                            <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                            El sistema de aprendizaje se activará cuando haya feedback de usuarios
+                        </div>
+                    `;
+                    document.getElementById('learningStatus').textContent = '⏸️ PENDIENTE';
+                }
+
+                html += '</div>';
+                container.innerHTML = html;
+            }
+
+            showError(message) {
+                console.error(message);
+                // Could implement a toast notification system here
+            }
+        }
+
+        // Global functions for button actions
+        async function refreshAnalytics() {
+            const dashboard = window.trainingDashboard;
+            if (dashboard) {
+                await dashboard.loadAnalytics();
+                await dashboard.loadDocumentStats();
+                await dashboard.loadFeedbackDetails();
+                await dashboard.loadUserInsights();
+                await dashboard.loadRegisteredUsers();
+                await dashboard.checkAPIHealth();
+                alert('✅ Dashboard actualizado correctamente');
+            }
+        }
+
+        async function exportTrainingData() {
+            try {
+                const apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'http://localhost:3000/api'
+                    : '/api';
+                const response = await fetch(`${apiBase}/training/export`);
+                const data = await response.json();
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `h2go-training-data-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Failed to export training data:', error);
+                alert('Failed to export training data');
+            }
+        }
+
+        async function prepareFineTune() {
+            try {
+                const apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'http://localhost:3000/api'
+                    : '/api';
+                const response = await fetch(`${apiBase}/training/prepare-finetune`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ modelName: 'h2go-supplement-advisor' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`Fine-tuning data prepared successfully!\nFile: ${data.fileName}\nData points: ${data.dataPoints}`);
+                } else {
+                    alert('Failed to prepare fine-tuning data');
+                }
+            } catch (error) {
+                console.error('Failed to prepare fine-tuning data:', error);
+                alert('Failed to prepare fine-tuning data');
+            }
+        }
+
+        async function viewAPIHealth() {
+            try {
+                const apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'http://localhost:3000/api'
+                    : '/api';
+                const response = await fetch(`${apiBase}/chat`);
+                const data = await response.json();
+                
+                alert(`API Status: ${data.status}\nMessage: ${data.message}\nConversations: ${data.trainingData.conversations}\nFeedback: ${data.trainingData.feedback}`);
+            } catch (error) {
+                alert('API is not responding');
+            }
+        }
+
+        function downloadConversations() {
+            // Implementation for downloading conversations
+            alert('Conversations download feature coming soon!');
+        }
+
+        function downloadFeedback() {
+            // Implementation for downloading feedback
+            alert('Feedback download feature coming soon!');
+        }
+
+        function generateReport() {
+            // Implementation for generating reports
+            alert('Report generation feature coming soon!');
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.trainingDashboard = new TrainingDashboard();
+        });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
