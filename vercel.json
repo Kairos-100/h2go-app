@@ -5,33 +5,54 @@
     {
       "src": "api/**/*.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "icons/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "manifest.json",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "service-worker.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "favicon.ico",
+      "use": "@vercel/static"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/training-dashboard.html",
+      "destination": "/training-dashboard.html"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|mp4|woff|woff2|ttf|eot|ico))",
-      "dest": "/$1"
+      "source": "/document-upload.html",
+      "destination": "/document-upload.html"
     },
     {
-      "src": "/training-dashboard.html",
-      "dest": "/training-dashboard.html"
-    },
-    {
-      "src": "/document-upload.html",
-      "dest": "/document-upload.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!api/.*).*)",
+      "destination": "/index.html"
     }
   ],
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key"
-  },
   "headers": [
     {
       "source": "/service-worker.js",
