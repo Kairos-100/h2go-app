@@ -1318,7 +1318,70 @@ function scrollToHowItWorks() {
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.h2goApp = new H2GOApp();
+    
+    // Initialize video background
+    initializeVideoBackground();
 });
+
+// Video background initialization and fallback handling
+function initializeVideoBackground() {
+    const video = document.getElementById('heroVideo');
+    const fallback = document.querySelector('.video-fallback');
+    
+    if (!video || !fallback) {
+        console.error('❌ Video or fallback element not found');
+        return;
+    }
+    
+    console.log('🎥 Initializing video background...');
+    
+    // Show fallback by default, hide when video loads
+    fallback.style.display = 'block';
+    video.style.display = 'none';
+    
+    // Try to load the video
+    video.addEventListener('loadstart', () => {
+        console.log('🔄 Video loading started...');
+    });
+    
+    video.addEventListener('loadeddata', () => {
+        console.log('✅ Video loaded successfully');
+        fallback.style.display = 'none';
+        video.style.display = 'block';
+        
+        // Try to play the video
+        video.play().then(() => {
+            console.log('▶️ Video playing successfully');
+        }).catch(error => {
+            console.warn('⚠️ Autoplay blocked:', error);
+            fallback.style.display = 'block';
+            video.style.display = 'none';
+        });
+    });
+    
+    video.addEventListener('error', (e) => {
+        console.error('❌ Video failed to load:', e);
+        console.log('Video src:', video.src || video.querySelector('source')?.src);
+        fallback.style.display = 'block';
+        video.style.display = 'none';
+    });
+    
+    video.addEventListener('canplay', () => {
+        console.log('🎬 Video can play');
+    });
+    
+    // If video doesn't load within 3 seconds, show fallback
+    setTimeout(() => {
+        if (video.readyState < 2) { // HAVE_CURRENT_DATA
+            console.warn('⚠️ Video taking too long to load, showing fallback');
+            fallback.style.display = 'block';
+            video.style.display = 'none';
+        }
+    }, 3000);
+    
+    // Force load the video
+    video.load();
+}
 
 // Add some interactive animations
 document.addEventListener('DOMContentLoaded', () => {

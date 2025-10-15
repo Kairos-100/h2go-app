@@ -1,4 +1,4 @@
-const storage = require('./_lib/storage');
+const storage = require('./_lib/hybrid-storage');
 
 module.exports = async (req, res) => {
     // Enable CORS
@@ -15,11 +15,18 @@ module.exports = async (req, res) => {
     // GET all users
     if (req.method === 'GET') {
         try {
-            const users = await storage.read('users.json');
+            const users = await storage.getAllUsers();
+            
+            // Add storage type info
+            const storageInfo = await storage.healthCheck();
+            
             res.json({
                 success: true,
                 users: users,
-                total: users.length
+                total: users.length,
+                storageType: storage.getStorageType(),
+                persistent: storage.isUsingPersistentStorage(),
+                storageInfo: storageInfo
             });
         } catch (error) {
             console.error('Get Users Error:', error);
@@ -33,34 +40,20 @@ module.exports = async (req, res) => {
         try {
             const { name, email, registrationDate, userId } = req.body;
             
-            const users = await storage.read('users.json');
-            
-            // Check if user already exists
-            const existingUser = users.find(u => u.email === email);
-            if (existingUser) {
-                return res.json({
-                    success: true,
-                    user: existingUser,
-                    message: 'User already registered'
-                });
-            }
-
-            // Add new user
-            const newUser = {
+            // Register user using hybrid storage
+            const newUser = await storage.registerUser({
                 name,
                 email,
                 registrationDate: registrationDate || new Date().toISOString(),
-                userId: userId || storage.generateId(),
-                id: storage.generateId()
-            };
-
-            users.push(newUser);
-            await storage.write('users.json', users);
+                userId: userId || storage.generateId()
+            });
 
             res.json({
                 success: true,
                 user: newUser,
-                message: 'User registered successfully'
+                message: 'User registered successfully',
+                storageType: storage.getStorageType(),
+                persistent: storage.isUsingPersistentStorage()
             });
         } catch (error) {
             console.error('User Registration Error:', error);

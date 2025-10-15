@@ -1,4 +1,4 @@
-const storage = require('../_lib/storage');
+const storage = require('../_lib/hybrid-storage');
 
 module.exports = async (req, res) => {
     // Enable CORS
@@ -17,11 +17,12 @@ module.exports = async (req, res) => {
     }
 
     try {
-        const users = await storage.read('users.json');
+        const stats = await storage.getUserStats();
         
         res.json({
-            totalUsers: users.length,
-            recentUsers: users.slice(-10).reverse()
+            ...stats,
+            storageType: storage.getStorageType(),
+            persistent: storage.isUsingPersistentStorage()
         });
     } catch (error) {
         console.error('User Stats Error:', error);
