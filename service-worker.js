@@ -24,7 +24,15 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('[Service Worker] Precaching assets');
-        return cache.addAll(PRECACHE_ASSETS.map(url => new Request(url, {cache: 'reload'})));
+        // Use a more robust caching strategy
+        return Promise.allSettled(
+          PRECACHE_ASSETS.map(url => 
+            cache.add(url).catch(error => {
+              console.warn(`[Service Worker] Failed to cache ${url}:`, error);
+              return null;
+            })
+          )
+        );
       })
       .then(() => self.skipWaiting())
       .catch((error) => {
@@ -100,19 +108,22 @@ self.addEventListener('fetch', (event) => {
               return response;
             }
 
-            // Clone the response
+            // Clone the response for caching
             const responseToCache = response.clone();
 
-            // Cache the fetched response for future use
+            // Cache the fetched response for future use (async, don't wait)
             caches.open(RUNTIME_CACHE)
               .then((cache) => {
                 cache.put(request, responseToCache);
+              })
+              .catch((cacheError) => {
+                console.warn('[Service Worker] Failed to cache response:', cacheError);
               });
 
             return response;
           })
           .catch((error) => {
-            console.error('[Service Worker] Fetch failed:', error);
+            console.warn('[Service Worker] Network fetch failed for:', request.url, error.message);
             
             // Return offline page or cached version if available
             return caches.match('/index.html')
@@ -129,6 +140,16 @@ self.addEventListener('fetch', (event) => {
                 );
               });
           });
+      })
+      .catch((error) => {
+        console.error('[Service Worker] Cache match failed:', error);
+        return new Response(
+          '<html><body><h1>Error</h1><p>Unable to load the page. Please try again later.</p></body></html>',
+          {
+            headers: { 'Content-Type': 'text/html' },
+            status: 500
+          }
+        );
       })
   );
 });
