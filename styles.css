@@ -299,15 +299,15 @@ body {
 /* Phone Frame Container */
 .phone-frame {
     background: linear-gradient(145deg, #2c2c2e 0%, #1c1c1e 100%);
-    border-radius: 25px;
-    padding: 15px;
+    border-radius: 30px;
+    padding: 20px;
     box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.4),
-        0 0 40px rgba(37, 99, 235, 0.2),
+        0 25px 80px rgba(0, 0, 0, 0.4),
+        0 0 50px rgba(37, 99, 235, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
         inset 0 -1px 0 rgba(0, 0, 0, 0.3);
     margin: 2rem auto;
-    max-width: 350px;
+    max-width: 420px;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.05);
     animation: phoneFloat 6s ease-in-out infinite;
@@ -323,24 +323,24 @@ body {
 .phone-frame::before {
     content: '';
     position: absolute;
-    top: 8px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60px;
-    height: 6px;
+    width: 70px;
+    height: 7px;
     background: linear-gradient(90deg, #000 0%, #333 50%, #000 100%);
-    border-radius: 3px;
+    border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .phone-frame::after {
     content: '';
     position: absolute;
-    bottom: 8px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
     background: linear-gradient(145deg, #1a1a1a 0%, #000 100%);
     border-radius: 50%;
     border: 3px solid #2c2c2e;
@@ -358,10 +358,10 @@ body {
 /* Chat Container */
 .chat-container {
     background: white;
-    border-radius: 20px;
+    border-radius: 25px;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    height: 600px;
+    height: 700px;
     display: flex;
     flex-direction: column;
 }
@@ -1084,34 +1084,34 @@ body {
 /* Phone Frame Responsive */
 @media (max-width: 768px) {
     .phone-frame {
-        max-width: 320px;
+        max-width: 380px;
         margin: 1rem auto;
-        padding: 12px;
+        padding: 16px;
     }
     
     .chat-container {
-        height: 500px;
+        height: 600px;
     }
     
     .phone-frame::before {
-        width: 50px;
-        height: 5px;
+        width: 60px;
+        height: 6px;
     }
     
     .phone-frame::after {
-        width: 25px;
-        height: 25px;
+        width: 30px;
+        height: 30px;
     }
 }
 
 @media (max-width: 480px) {
     .phone-frame {
-        max-width: 300px;
-        padding: 10px;
+        max-width: 340px;
+        padding: 14px;
     }
     
     .chat-container {
-        height: 450px;
+        height: 550px;
     }
 }
 
@@ -1442,16 +1442,16 @@ body {
 .chat-form-container {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border: 2px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin: 1rem 0;
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 1.5rem 0;
     width: 100%;
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
     position: relative;
 }
 
@@ -1461,15 +1461,15 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 5px;
     background: linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #8b5cf6 100%);
-    border-radius: 16px 16px 0 0;
+    border-radius: 20px 20px 0 0;
 }
 
 .chat-form-container h4 {
     color: #2563eb;
-    margin-bottom: 1.25rem;
-    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
     text-align: center;
     font-weight: 700;
     text-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
@@ -1484,8 +1484,8 @@ body {
 .chat-form-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
     width: 100%;
     box-sizing: border-box;
 }
@@ -1501,8 +1501,8 @@ body {
 .chat-supplement-form label {
     font-weight: 600;
     color: #1e293b;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1520,15 +1520,15 @@ body {
 .chat-supplement-form input,
 .chat-supplement-form select {
     width: 100%;
-    padding: 0.875rem 1rem;
+    padding: 1rem 1.25rem;
     border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    font-size: 0.95rem;
+    border-radius: 12px;
+    font-size: 1rem;
     transition: all 0.3s ease;
     background: #ffffff;
     box-sizing: border-box;
     max-width: 100%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
     line-height: 1.4;
 }
 
@@ -1595,23 +1595,23 @@ body {
 @media (max-width: 768px) {
     .chat-form-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.25rem;
     }
     
     .chat-form-container {
-        padding: 1.5rem;
-        margin: 0.75rem 0;
+        padding: 1.75rem;
+        margin: 1.25rem 0;
     }
     
     .chat-form-container h4 {
-        font-size: 1.1rem;
-        margin-bottom: 1.25rem;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
     }
     
     .chat-supplement-form input,
     .chat-supplement-form select {
-        padding: 0.875rem;
-        font-size: 0.95rem;
+        padding: 1rem;
+        font-size: 1rem;
     }
     
     .chat-form-submit {
