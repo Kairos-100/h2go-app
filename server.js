@@ -12,7 +12,11 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.')); // Serve static files from current directory
+
+// Serve static files from current directory
+app.use(express.static(__dirname));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/icons', express.static(path.join(__dirname, 'icons')));
 
 // Serve index.html for root route
 app.get('/', (req, res) => {
